@@ -1,12 +1,15 @@
 import random
 from datetime import datetime
+import validation
+
+from validation import accountnumvalidation
+
+import database
+from getpass import getpass
 
 
 def accountgenerator():
     return random.randrange(1111111111, 9999999999)
-
-
-database = {}
 
 
 def initial():
@@ -29,19 +32,36 @@ def initial():
             initial()
 
 
+# def login():
+# print("welcome again, log in")
+# accountnumfromuser = int(input("what is you accout number")
+# password = input("what is your password")
+# if account_number_validation(accountnumfromuser):
+# user = database.authenticated_user(account_number_from_user, password)
+# if user:
+# bankoperations(user)
+
+##print("invalid account ot password")
+# login()
 def login():
-    print("log in")
+    print("********* Login ***********")
 
-    accountnumfromuser = int(input("what is you accout number"))
-    password = input("what is your password")
+    accountNumberFromUser = int(input("What is your account number? \n"))
+    password = input("What is your password \n")
+    account_number_from_user = input("What is your account number? \n")
 
-    for accountnum, userdetails in database.items():
-        if accountnum == accountnumfromuser:
-            if userdetails[3] == password:
-                bankoperations(userdetails)
+    for accountNumber, userDetails in database.items():
+        if (accountNumber == accountNumberFromUser):
+            if (userDetails[3] == password):
+                bankOperation(userDetails)
 
-    print("invalid account ot password")
+    print('Invalid account or password')
     login()
+
+    is_valid_account_number = validation.account_number_validation(account_number_from_user)
+
+
+
 
 
 def register():
@@ -51,11 +71,24 @@ def register():
     last_name = input("what us your last name")
     password = input("Create a unique password for yourself")
     accnumber = accountgenerator()
-    database[accnumber] = [first_name, last_name, email, password]
-    print("your account has been created ")
-    print("your accoumt number is.....")
-    print(accnumber)
-    login()
+
+    try:
+        accnumber = accountgenerator()
+    except ValueError:
+        print("account generation due to unknown reason")
+        exit()
+
+        # database[accnumber] = [first_name, last_name, email, password]
+    is_user_created = database.create(accnumber, first_name, last_name, email, password, 0)
+
+    if is_user_created:
+
+        print("your account has been created ")
+        print("your accoumt number is.....")
+        print(accnumber)
+        login()
+    else:
+        print('something went wrong try again')
 
 
 def bankoperations(user):
@@ -103,6 +136,27 @@ def complain():
     usercomplaint = input("what issue would you like to report ")
     if usercomplaint == str:
         print("Were sorry to hear that call 1800-234-5678 to get in touch with a repesentitive ")
+
+
+def accountnumvalidation(account_num):
+    if account_num:
+
+        if len(str(account_num)) == 10:
+
+            try:
+                int(account_num)
+            except ValueError:
+                print("invalid account number, account number should be an integer")
+                return False
+            except TypeError:
+                print("invalid accoutn type")
+                return False
+        else:
+            print("account number can be more than 10 digits ")
+
+    else:
+        print("account number not found")
+        return False
 
 
 initial()
